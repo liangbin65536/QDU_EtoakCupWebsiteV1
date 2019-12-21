@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>战队查询</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="/static/lib/materialize.min.css">
+    <!--icon-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <form class="col s12 m12 l12" onsubmit="return false;">
+            <div class="row">
+                <div class="input-field col s6 m6 l5 offset-s3 offset-m3 offset-l3">
+                    <input id="mobile" type="tel"  data-length="11" required>
+                    <label for="mobile">请输入你的手机号</label>
+                </div>
+                <div class="input-field col s3 m3 l4 left">
+                    <button class="btn waves-effect waves-light" id="search_btn">查找
+                        <i class="material-icons right">search</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="row">
+        <div class="col s6 m6 l6 offset-s3 offset-m3 offset-l3" id="detail_table" hidden>
+            <table class="centered">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>手机号</th>
+                        <th>队伍</th>
+                        <th>团队项目</th>
+                        <th>个人成绩</th>
+                        <th>团队成绩</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td id="uname_td"></td>
+                        <td id="mobile_td"></td>
+                        <td id="tname_td"></td>
+                        <td id="titem_td"></td>
+                        <td id="sscore_td"></td>
+                        <td id="tscore_td"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <br/>
+    <div class="row">
+        <div class="col s6 m6 l6 offset-s3 offset-m3 offset-l3" id="member_table" hidden>
+            <table class="centered">
+                <thead>
+                    <tr>
+                        <th>姓名</th>
+                        <th>手机号</th>
+                        <th>操作</th>
+                        <th>身份</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="member:${session.members}">
+                        <td class="member_name" th:text="${member.name}"></td>
+                        <td class="member_mobile" th:text="${member.mobile}"></td>
+                        <td class="delete_button" th:value="${member.id}">
+                            <a class="waves-effect waves-light red lighten-1 btn tooltipped" th:disabled="${member.authority==1} ? 'true' : 'false'" data-position="top" data-tooltip="踢出队伍后该用户的报名信息将会删除，请谨慎操作！">踢出队伍</a>
+                        </td>
+                        <td>
+                            <span class="badge teal white-text" th:text="${member.authority==1} ? '队长' : '队员'"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <form class="col s12 m12 l12" onsubmit="return false;" id="select_form" hidden>
+            <div class="row">
+                <div class="input-field col s6 m6 l5 offset-s3 offset-m3 offset-l3">
+                    <select id="item_select">
+                        <option th:each="tsubject:${tsubjectlist}" th:value="${tsubject.id}" th:text="${tsubject.title}"></option>
+                    </select>
+                    <label>选择项目</label>
+                </div>
+                <div class="input-field col s3 m3 l4 left">
+                    <button class="btn waves-effect waves-light" id="select_btn">确定
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+
+</body>
+<!--jquery-->
+<script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.js"></script>
+<!-- Compiled and minified JavaScript -->
+<script src="../../static/lib/materialize.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $('.tooltipped').tooltip();
+        $('select').formSelect();
+    });
+    $('#search_btn').click(function () {
+        $.ajax({
+            url: '/user',
+            type: 'get',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: {"mobile": $("#mobile").val()},
+            success: function (result) {
+                if (result != null && result != "") {
+                    $('#uname_td').html(result.uname);
+                    $('#mobile_td').html(result.mobile);
+                    $('#tname_td').html(result.tname);
+                    $('#titem_td').html(result.titem);
+                    $('#sscore_td').html(result.sscore);
+                    $('#tscore_td').html(result.tscore);
+                    $('#detail_table').show();
+                    if (result.authority==1) {
+                        $('#member_table').show();
+                        $('#select_form').show();
+                    }
+                }
+                else {
+                    M.toast({html: "查询不到这个手机号的记录!", displayLength: '2500'})
+                }
+            }
+        })
+    })
+    $('.delete_button').click(function () {
+        var memberid = $(this).attr("value");
+        $.ajax({
+            url: '/user/delete',
+            type: 'get',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: {"memberid": memberid, "mobile": $("#mobile").val()},
+            success: function (result) {
+                M.toast({html: result.message+",请刷新后继续操作" , displayLength: '2500'})
+                setTimeout("window.location.href='/details'",1000)
+            }
+        })
+
+    })
+    $('#select_btn').click(function () {
+        $.ajax({
+            url: '/user/updateitem',
+            type: 'get',
+            contentType: 'application/json',
+            dataType: 'json',
+            data: {"mobile": $("#mobile").val(), "itemid": $("#item_select").val()},
+            success: function (result) {
+                M.toast({html: result.message+",请刷新后查看" , displayLength: '2500'})
+                setTimeout("window.location.href='/details'",1000)
+            }
+        })
+    })
+</script>
+</html>

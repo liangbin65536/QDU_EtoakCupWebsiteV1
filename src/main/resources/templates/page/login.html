@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易途杯个人赛线上比赛系统 - 登录</title>
+    <link href="https://cdn.bootcss.com/element-ui/2.2.2/theme-chalk/index.css" rel="stylesheet">
+</head>
+
+<body style="background: #F3F3F4">
+    <div style="text-align: center;">
+        <h1 style="color: #E6E6E6; font-size: 96px; margin-bottom: 5px;line-height:90px">EtoakCup</h1>
+        <br/>
+        <h3 style="color: #686B6D;margin-top: 0px;">欢迎参加易途杯编程大赛个人赛</h3>
+    </div>
+    <div id="loginForm">
+        <el-row>
+            <el-col :sm="{span:22,offset:0}" :md="{span:20,offset:0}" :lg="{span:6,offset:9}">
+                <el-form :model="form" ref="form" label-width="45px">
+                    <el-form-item label="账号" prop="username">
+                        <el-input v-model.trim="form.username"></el-input>
+                    </el-form-item>
+                    <el-form-item label="密码" prop="password">
+                        <el-input type="password" v-model.trim="form.password"></el-input>
+                    </el-form-item>
+                    <el-form-item style="text-align: center">
+                            <el-button style="text-align: center;" type="primary" size="medium" @click="submit">开 始 考 试</el-button>
+                    </el-form-item>
+                </el-form>
+            </el-col>
+        </el-row>
+        <el-row>
+            <el-col :sm="{span:22,offset:0}" :md="{span:20,offset:0}" :lg="{span:6,offset:9}">
+                <el-alert
+                        title="请自觉遵守比赛规则，谢绝交流"
+                        type="warning"
+                        :closable="false"
+                        show-icon>
+                </el-alert>
+                <el-alert
+                        title="比赛时间一共90分钟，30题，提交后可查看排行"
+                        type="warning"
+                        :closable="false"
+                        show-icon>
+                </el-alert>
+            </el-col>
+        </el-row>
+    </div>
+</body>
+<script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+<script src="https://cdn.bootcss.com/element-ui/2.3.4/index.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<script>
+    var vue = new Vue({
+        el: '#loginForm',
+        data: {
+            form: {
+                username: '',
+                password: ''
+            },
+        },
+        methods: {
+            submit() {
+                // var de = document.documentElement;
+                // de.webkitRequestFullScreen();
+                var _this = this;
+                axios({
+                    method: 'post',
+                    url: '/contest/login',
+                    headers: {
+                        'Content-type': 'application/x-www-form-urlencoded'
+                    },
+                    params: {
+                        'username': this.form.username,
+                        'password': this.form.password
+                    }
+                })
+                    .then(function (response) {
+                        if (response.data.code==='1'){
+                            sessionStorage.removeItem('answer');
+                            sessionStorage.removeItem('times');
+                            sessionStorage.removeItem('timer');
+                            window.location.href = '/contest/question';
+                        } else if (response.data.code==='0') {
+                            _this.$notify({
+                                title: '警告',
+                                message: response.data.message,
+                                type: 'warning'
+                            });
+                        } else {
+                            _this.$notify({
+                                title: '警告',
+                                message: response.data.message,
+                                type: 'warning'
+                            });
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+            }
+        }
+    })
+</script>
+</html>

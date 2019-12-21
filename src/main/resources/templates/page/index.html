@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>第五届易途杯暨第二届青岛大学编程大赛报名</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="/static/lib/materialize.min.css">
+    <!--icon-->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        /*!* label focus color *!*/
+        /*.input-field input[type=text]:focus + label {*/
+            /*color: #1de9c3;*/
+        /*}*/
+        /*!* label underline focus color *!*/
+        /*.input-field input[type=text]:focus {*/
+            /*border-bottom: 1px solid #1de9c3;*/
+            /*box-shadow: 0 1px 0 0 #1de9c3;*/
+        /*}*/
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <h5 class="blue-text text-darken-2 center-align col s12 m12 l6 offset-l3">欢迎报名青大易途杯编程大赛</h5>
+    </div>
+    <div class="row">
+        <form class="col s12 m12 l6 offset-l3" action="/user" method="post" th:action="@{/user}" th:object="${newuser}">
+            <div class="row">
+                <div class="input-field col s6 m6 l6">
+                    <input id="name" type="text" class="validate" th:field="*{name}" pattern="^[\u4E00-\u9FA5]{2,4}$" required>
+                    <label for="name">姓名</label>
+                    <span class="helper-text" data-error="仅限2-4位中文名"></span>
+                </div>
+                <div class="input-field col s6 m6 l6">
+                    <input id="password" type="password" class="validate" th:field="*{password}" pattern="^[\u4E00-\u9FA5A-Za-z0-9_]{6,18}$" required>
+                    <label for="password">密码</label>
+                    <span class="helper-text" data-error="仅限6-18位中英文、数字和下划线"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s6 m6 l6">
+                    <input id="mobile" type="tel" class="validate" data-length="11" th:field="*{mobile}" pattern="^1([358][0-9]|4[579]|66|7[0135678]|9[89])[0-9]{8}$" required>
+                    <label for="mobile">联系方式</label>
+                    <span class="helper-text" data-error="请使用中国大陆滴手机号"></span>
+                </div>
+                <div class="input-field col s6 m6 l6">
+                    <input id="major" type="text" class="validate" th:field="*{major}" pattern="^[\u4E00-\u9FA5_]{2,12}$" required>
+                    <label for="major">所学专业</label>
+                    <span class="helper-text" data-error="仅限2-12位中文"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m12 l12">
+                    <input id="remark" type="text" class="validate" th:field="*{remark}" pattern="^[\u4E00-\u9FA5A-Za-z0-9_]{0,100}$">
+                    <label for="remark">备注</label>
+                    <span class="helper-text" data-error="仅限中英文数字"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col s3 m3 l3">
+                    <label>
+                        <input th:name="authority" type="radio" th:value="0" />
+                        <span>我是队员</span>
+                    </label>
+                </div>
+                <div class="col s3 m3 l3">
+                    <label>
+                        <input th:name="authority" type="radio" th:value="1"  />
+                        <span>我是队长</span>
+                    </label>
+                </div>
+                <div class="col s3 m3 l3">
+                    <label>
+                        <input type="checkbox" id="person_check" th:name="personal" th:value="on" />
+                        <span>参加个人赛</span>
+                    </label>
+                </div>
+                <div class="input-field col s3 m3 l3" id="personalItem" style="display: none">
+                    <select th:field="*{item}">
+                        <option th:value="Java">Java</option>
+                        <option th:value="C">C</option>
+                        <option th:value="Java算法">Java(算法)</option>
+                        <option th:value="C算法">C(算法)</option>
+                        <option th:value="PHP">PHP</option>
+                    </select>
+                    <label>选取参赛项目</label>
+                </div>
+            </div>
+            <div class="row" id="team_select">
+                <div class="input-field col s12 m12 l12">
+                    <select id="form_select" th:field="*{tid}">
+                        <option th:each="team:${teamlist}" th:value="${team.id}" th:text="${team.tname}"></option>
+                    </select>
+                    <label>选择你的团队</label>
+                </div>
+            </div>
+            <div class="row" id="team_input" style="display: none">
+                <div class="input-field col s6 m6 l6">
+                    <input id="tname" type="text" class="validate" th:field="*{tname}" pattern="^[\u4E00-\u9FA5A-Za-z0-9_]{2,12}$" data-length="12">
+                    <label for="tname">团队名称</label>
+                    <span class="helper-text"  data-error="队名仅限2-12位中英文数字"></span>
+                </div>
+                <div class="input-field col s6 m6 l6">
+                    <input id="slogan" type="text" class="validate" th:field="*{slogan}" pattern="^[\u4E00-\u9FA5A-Za-z0-9!！?？_]{2,20}$" data-length="20" >
+                    <label for="slogan">团队口号</label>
+                    <span class="helper-text"  data-error="口号长度仅限为2-20"></span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field col s12 m12 l12">
+                    <select th:field="*{titem}">
+                        <option th:each="tsubject:${tsubjectlist}" th:value="${tsubject.id}" th:text="${tsubject.title}"></option>
+                    </select>
+                    <label>选择项目</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="input-field left">
+                    <a class="blue-text text-darken-2 waves-effect waves-teal btn-flat" href="/details">查看个人报名情况</a>
+                </div>
+                <div class="input-field right">
+                    <button class="btn waves-effect waves-light" type="submit" name="action" id="submit_btn">提交
+                        <i class="material-icons right">send</i>
+                    </button>
+                </div>
+            </div>
+            <div class="row" style="margin-bottom: 0px !important;">
+                <blockquote>
+                    <div class="flow-text grey-text text-darken-3" style="font-size: 15px">
+                        Tips: <br/>
+                        1.参加个人赛请勾选「参加个人赛」并在浮现的选项框中选择自己要参加的项目。<br/>
+                        2.参加团队赛(请务必让队长先注册并提交团队信息）<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;1）队员请选择「我是队员」并选择自己所加入的团队名称，团队项目仅供浏览，选择无效<br/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;2）队长请选择「我是队长」后创建「团队名称」和「团队口号」，并选择团队项目<br/>
+                        3.<b>仅</b>参加个人赛的同学请<b>在「选择你的团队中」选择「孤狼」团队</b><br/>
+                        4.点击「查看个人报名情况」,队长可以查看队员列表,点击「踢出队伍」即可删除队员信息，<b>队员信息有误时用这种方式重新注册</b>
+                    </div>
+                </blockquote>
+            </div>
+        </form>
+    </div>
+</div>
+</body>
+<!--jquery-->
+<script src="https://cdn.bootcss.com/jquery/3.3.0/jquery.js"></script>
+<!-- Compiled and minified JavaScript -->
+<script src="../../static/lib/materialize.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $('input#mobile').characterCounter();
+        $('input#slogan').characterCounter();
+        $('input#tname').characterCounter();
+        $('select').formSelect();
+        $('#person_check').click(function () {
+            $('#personalItem').toggle(300);
+        })
+        $(':radio').click(function () {
+            if ($("[name='authority']:eq(0)").prop("checked")){
+                $('#team_select').show(300);
+                $('#form_select').attr("disabled",false);
+                $('#team_input').hide(300);
+            }
+            else if ($("[name='authority']:eq(1)").prop("checked")) {
+                $('#team_select').hide(300);
+                $('#form_select').attr("disabled",true);
+                $('#team_input').show(300);
+            }
+        })
+        $('#mobile').blur(function () {
+            $.ajax({
+                url: '/user/mobilecheck',
+                type: 'get',
+                contentType:'application/x-www-form-urlencoded',
+                dataType: 'json',
+                data: { "mobile":$("#mobile").val()},
+                success: function (result) {
+                    if (result.code=='0') {
+                        M.toast({html: '这个手机号已经注册过啦!',displayLength: '2500'})
+                        $("#submit_btn").addClass("disabled")
+                    }
+                    else {
+                        $("#submit_btn").removeClass("disabled");
+                    }
+                }
+            })
+        })
+        $('#tname').blur(function () {
+            $.ajax({
+                url: '/user/tnamecheck',
+                type: 'get',
+                contentType:'application/x-www-form-urlencoded',
+                dataType: 'json',
+                data: { "tname":$("#tname").val()},
+                success: function (result) {
+                    if (result.code=='0') {
+                        M.toast({html: '这个队名已经有人起啦!',displayLength: '2500'})
+                        $("#submit_btn").addClass("disabled")
+                    }
+                    else {
+                        $("#submit_btn").removeClass("disabled");
+                    }
+                }
+            })
+        })
+
+    });
+</script>
+</html>

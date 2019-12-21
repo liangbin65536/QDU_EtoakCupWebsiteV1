@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>易途杯个人赛</title>
+    <link href="https://cdn.bootcss.com/element-ui/2.3.4/theme-chalk/index.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/highlight.js/9.12.0/styles/atelier-seaside-light.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #eee;
+            height: 100%;
+        }
+    </style>
+</head>
+<body onkeydown="banKey()" oncontextmenu="return false" onselectstart = "return false" oncopy = "return false">
+    <el-container id="main_content">
+        <el-main style="padding-top: 0px;">
+            <keep-alive>
+            <subject inline-template>
+                <div>
+                    <div style="height: 45px;">
+                        <el-row :gutter="12">
+                            <el-col :span="9" :offset="6" style="background: #232c31; height: 45px">
+                                <el-progress :text-inside="true" :stroke-width="20" :percentage="progress" status="success" color="#1abc9c" style="margin-top: 10px"></el-progress>
+                            </el-col>
+                            <el-col :span="3" style="background: #232c31; height: 45px; padding-top: 8px;">
+                                <span style="font-size: 20px; color: white; text-align: center;">  剩余时间：  {{  timem}}分 {{times}}秒</span>
+                            </el-col>
+                        </el-row>
+                    </div>
+                    <el-row :gutter="12">
+                        <el-col :span="6" :push="6" style="padding: 10px; border-bottom: 1px solid #eee; background-color: #fff">
+                            <el-tag size="medium" style="margin-left: 10px">单选题</el-tag>
+                        </el-col>
+                        <el-col :span="6" :push="6" style="padding: 14px; border-bottom: 1px solid #eee; background-color: #fff">
+                            <el-rate
+                                    v-model="item_degree"
+                                    :colors="['#67C23A', '#E6A23C', '#F56C6C']"
+                                    disabled
+                                    show-score
+                                    text-color="#ff9900"
+                                    score-template="{value}"
+                                    style="text-align: right">
+                            </el-rate>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="12">
+                        <el-col :span="12" :push="6" style="padding: 0px; background-color: #fff">
+                            <div style="float: left; font-size: 16px; padding-left: 20px; padding-top: 15px; padding-bottom: 20px">{{qtext}}</div>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="12" style="margin-top: 10px; margin-bottom: 10px;" v-for="option in options" :key="option.value">
+                        <el-col :span="12" :push="6" style="padding: 0px; background-color: #fff">
+                            <el-radio v-model="option_radio" :label="option.value" :change="optionChange()" border style="width: 100%; height: 100%; padding: 12px;">{{ option.detail }}</el-radio>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="12">
+                        <el-col :span="6" :push="6" style="padding-bottom: 10px;  border-bottom: 2px dashed #fff">
+                            <el-button type="warning" @click="submit()">提前交卷</el-button>
+                        </el-col>
+                        <el-col :span="6" :push="6" style="padding-bottom: 10px; text-align: right; border-bottom: 2px dashed #fff">
+                            <el-button type="success" v-if="qid==30" @click="submit()">交卷</el-button>
+                            <el-button type="success" v-else @click="nextQues()">下一题</el-button>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="12" style="margin: 10px 0px">
+                        <el-col :span="1" :push="6" v-for="i in [1,2,3,4,5,6,7,8,9]" :key="i">
+                            <router-link :to="'/question/'+i" tag="el-button">0{{i}}</router-link>
+                        </el-col>
+                        <el-col :span="1" :push="6" v-for="i in [10,11,12]" :key="i">
+                            <router-link :to="'/question/'+i" tag="el-button">{{i}}</router-link>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="12" style="margin: 10px 0px">
+                        <el-col :span="1" :push="6" v-for="i in [13,14,15,16,17,18,19,20,21,22,23,24]" :key="i">
+                            <router-link :to="'/question/'+i" tag="el-button">{{i}}</router-link>
+                        </el-col>
+                    </el-row>
+                    <el-row :gutter="12" style="margin: 10px 0px">
+                        <el-col :span="1" :push="6" v-for="i in [25,26,27,28,29,30]" :key="i">
+                            <router-link :to="'/question/'+i" tag="el-button">{{i}}</router-link>
+                        </el-col>
+                    </el-row>
+                </div>
+            </subject>
+            </keep-alive>
+        </el-main>
+        <el-footer>
+            <el-row :gutter="12">
+                <el-col :span="12" :push="6" style="padding-bottom: 10px; ">
+                    <el-alert
+                            title="请不要在考试中途将窗口切出！"
+                            type="warning"
+                            :closable="false"
+                            show-icon>
+                    </el-alert>
+                </el-col>
+            </el-row>
+            <el-row :gutter="12">
+                <el-col :span="12" :push="6" style="padding-bottom: 10px; ">
+                    <el-alert
+                            title="每个人的题目都是随机生成的，谢绝交流！"
+                            type="warning"
+                            :closable="false"
+                            show-icon>
+                    </el-alert>
+                </el-col>
+            </el-row>
+        </el-footer>
+    </el-container>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+    <br/>
+</body>
+<script src="https://cdn.bootcss.com/vue/2.5.16/vue.js"></script>
+<script src="https://cdn.bootcss.com/vue-router/3.0.1/vue-router.js"></script>
+<script src="https://cdn.bootcss.com/element-ui/2.3.4/index.js"></script>
+<script src="https://cdn.bootcss.com/axios/0.18.0/axios.min.js"></script>
+<script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+<script>
+    const subject = Vue.component('subject', {
+        data() {
+            return {
+                progress: 3,
+                item_degree: 0,
+                option_radio: -1,
+                timem: 89,
+                times: 59,
+                qid: '',
+                qtext: '',
+                qcode: '',
+                options: [{
+                    value: '',
+                    detail: ''
+                }],
+                subjects: [{
+                    language: '',
+                    level: 0,
+                    qtext: '',
+                    qcode: '',
+                    options: '',
+                }],
+                answer: [-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1],
+                intervalid: ''
+            }
+        },
+        created() {
+            // 组件创建完后获取数据，
+            // 此时 data 已经被 observed 了
+            this.getAllSubjects();
+            router.push({ path: '/question/1' });
+            this.fetchData();
+        },
+        watch: {
+            // 如果路由有变化，会再次执行该方法
+            '$route': 'fetchData'
+        },
+        methods: {
+            fetchData() {
+                this.qid = this.$route.params.id;
+                let index = parseInt(this.qid)-1;
+                this.qtext = this.qid + "." + this.subjects[index].qtext;
+                this.item_degree = this.subjects[index].level;
+                this.qcode = this.subjects[index].qcode;
+
+                this.answer = JSON.parse(sessionStorage.getItem('answer'));
+                var answernum = 0;
+                for (var i in this.answer) {
+                    if (this.answer[i]!==-1) {
+                        answernum++;
+                    }
+                }
+                this.progress = parseInt(answernum/30*100);
+                if(this.answer[index]!==-1 && this.answer[index]!== ""){
+                    this.option_radio = this.answer[index];
+                }
+                else {
+                    this.option_radio = -1
+                }
+                let optioninit = this.subjects[index].options.split("#");
+                for (let f = 0; f < optioninit.length; f++) {
+                    let option = {
+                        value: '',
+                        detail: ''
+                    };
+                    option.value = f;
+                    option.detail = optioninit[f];
+                    this.options[f] = option;
+                }
+                this.options = this.options.slice(0,optioninit.length);
+            },
+            getAllSubjects() {
+                let _this = this;
+                if (sessionStorage.getItem('answer')==null) {
+                    sessionStorage.setItem('answer', JSON.stringify(this.answer));
+                }
+                if (sessionStorage.getItem('times')!==null&&sessionStorage.getItem('timem')!==null) {
+                    this.times = sessionStorage.getItem('times');
+                    this.timem = sessionStorage.getItem('timem');
+                }
+                this.answer = JSON.parse(sessionStorage.getItem('answer'));
+                axios.get('/contest/allsubjects', {})
+                    .then(function (response) {
+                        for (let s = 0; s < response.data.length; s++) {
+                            let subject = {
+                                language: '',
+                                level: 0,
+                                qtext: '',
+                                qcode: '',
+                                options: '',
+                            };
+                            subject.language = response.data[s].language;
+                            subject.level = response.data[s].level;
+                            subject.qtext = response.data[s].question;
+                            subject.qcode = response.data[s].code;
+                            subject.options = response.data[s].options;
+                            _this.subjects[s] = subject;
+                        }
+                        _this.qtext = "1."+_this.subjects[0].qtext;
+                        _this.item_degree = _this.subjects[0].level;
+                        _this.qcode = _this.subjects[0].qcode;
+                        _this.option_radio = _this.answer[0];
+                        let optioninit = _this.subjects[0].options.split("#");
+                        for (let f = 0; f < optioninit.length; f++) {
+                            let option = {
+                                value: '',
+                                detail: ''
+                            };
+                            option.value = f;
+                            option.detail = optioninit[f];
+                            _this.options[f] = option;
+                        }
+                    })
+                    .catch(function (error) {
+                        console.log(error);
+                    });
+                this.intervalid = setInterval(this.timer,1000); // 每隔1S执行一次
+                setInterval(this.keep,600000);
+            },
+            optionChange() {
+                let index = parseInt(this.qid)-1;
+                this.answer[index] = this.option_radio;
+                sessionStorage.setItem('answer', JSON.stringify(this.answer));
+            },
+            submit() {
+                this.$msgbox({
+                    title: 'Warning',
+                    message: '确认交卷？',
+                    showCancelButton: true,
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    beforeClose: (action, instance, done) => {
+                        if (action === 'confirm') {
+                            instance.confirmButtonLoading = true;
+                            instance.confirmButtonText = '提交试卷中...';
+                            let answer = JSON.parse(sessionStorage.getItem('answer'));
+                            axios.post('/contest/submit',{
+                                answer: answer
+                            }).then(function (response) {
+                                if (response.data.code==="1") {
+                                    done();
+                                }
+                            }).catch(function (error) {
+                                console.log(error);
+                            })
+                        }
+                        else {
+                            done();
+                        }
+                    }
+                }).then(action=> {
+                    if (action==='confirm') {
+                        this.$message({
+                            type: 'info',
+                            message: '提交成功!正在跳转...'
+                        });
+                        setTimeout("window.location.href='/rank'",1000)
+                    }
+                })
+            },
+            timer() {
+                if(this.times===0) {
+                    this.times = 59;
+                    this.timem = this.timem-1;
+                }
+                else if (this.times===1&&this.timem===0) {
+                    clearInterval(this.intervalid);
+                    this.$message({
+                        message: '时间到，正在交卷...',
+                        type: 'warning'
+                    });
+                    let answer = JSON.parse(sessionStorage.getItem('answer'));
+                    axios.post('/contest/submit',{
+                        answer: answer
+                    }).then(function (response) {
+                        if (response.data.code==="1") {
+                            setTimeout("window.location.href='/rank'",1000)
+                        }
+                    }).catch(function (error) {
+                        console.log(error);
+                    })
+                }
+                else {
+                    this.times = this.times-1;
+                }
+                sessionStorage.setItem('times', this.times);
+                sessionStorage.setItem('timem', this.timem);
+            },
+            keep() {
+                axios.get('/contest/keepsession',{
+                }).then(function (response) {
+                    console.log(response)
+                }).catch(function (error) {
+                    console.log(error);
+                })
+            },
+            nextQues() {
+                let nextq = parseInt(this.qid) + 1;
+                router.push({ path: '/question/'+ nextq });
+            }
+        }
+    });
+    const router = new VueRouter({
+        routes: [
+            { path: '/question/:id', component: subject}
+        ]
+    });
+
+    const vm = new Vue({
+        el: '#main_content',
+        router,
+        data() {
+            return {
+                progress: 3
+            }
+        },
+
+    });
+    hljs.initHighlightingOnLoad();
+    function banKey() {
+        if(window.event.keyCode===123)
+        {
+            window.event.returnValue= false;
+        }
+    }
+</script>
+</html>

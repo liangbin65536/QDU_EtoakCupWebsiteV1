@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.qdujava.etoakcup.dao.UserEntityMapper">
+  <resultMap id="BaseResultMap" type="com.qdujava.etoakcup.entity.UserEntity">
+    <id column="id" jdbcType="VARCHAR" property="id" />
+    <result column="authority" jdbcType="INTEGER" property="authority" />
+    <result column="mobile" jdbcType="VARCHAR" property="mobile" />
+    <result column="tid" jdbcType="VARCHAR" property="tid" />
+    <result column="password" jdbcType="VARCHAR" property="password" />
+    <result column="item" jdbcType="VARCHAR" property="item" />
+    <result column="sscore" jdbcType="INTEGER" property="sscore" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="major" jdbcType="VARCHAR" property="major" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
+  </resultMap>
+    <resultMap id="DetailResultMap" type="com.qdujava.etoakcup.entity.DetailEntity">
+        <id column="mobile" property="mobile"/>
+        <result column="uname" property="uname"/>
+        <result column="tname" property="tname"/>
+        <result column="titem" property="titem"/>
+        <result column="tscore" property="tscore"/>
+        <result column="sscore" property="sscore"/>
+        <result column="authority" property="authority"/>
+    </resultMap>
+  <sql id="Base_Column_List">
+    id, authority, mobile, tid, password, item, sscore, name, major, remark
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select
+    <include refid="Base_Column_List" />
+    from user
+    where id = #{id,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from user
+    where id = #{id,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.qdujava.etoakcup.entity.UserEntity">
+    insert into user (id, authority, mobile, 
+      tid, password, item, 
+      sscore, name, major, 
+      remark)
+    values (#{id,jdbcType=VARCHAR}, #{authority,jdbcType=INTEGER}, #{mobile,jdbcType=VARCHAR}, 
+      #{tid,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, #{item,jdbcType=VARCHAR}, 
+      #{sscore,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{major,jdbcType=VARCHAR}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.qdujava.etoakcup.entity.UserEntity">
+    insert into user
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="authority != null">
+        authority,
+      </if>
+      <if test="mobile != null">
+        mobile,
+      </if>
+      <if test="tid != null">
+        tid,
+      </if>
+      <if test="password != null">
+        password,
+      </if>
+      <if test="item != null">
+        item,
+      </if>
+      <if test="sscore != null">
+        sscore,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="major != null">
+        major,
+      </if>
+      <if test="remark != null">
+        remark,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=VARCHAR},
+      </if>
+      <if test="authority != null">
+        #{authority,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null">
+        #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="tid != null">
+        #{tid,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="item != null">
+        #{item,jdbcType=VARCHAR},
+      </if>
+      <if test="sscore != null">
+        #{sscore,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="major != null">
+        #{major,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.qdujava.etoakcup.entity.UserEntity">
+    update user
+    <set>
+      <if test="authority != null">
+        authority = #{authority,jdbcType=INTEGER},
+      </if>
+      <if test="mobile != null">
+        mobile = #{mobile,jdbcType=VARCHAR},
+      </if>
+      <if test="tid != null">
+        tid = #{tid,jdbcType=VARCHAR},
+      </if>
+      <if test="password != null">
+        password = #{password,jdbcType=VARCHAR},
+      </if>
+      <if test="item != null">
+        item = #{item,jdbcType=VARCHAR},
+      </if>
+      <if test="sscore != null">
+        sscore = #{sscore,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="major != null">
+        major = #{major,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.qdujava.etoakcup.entity.UserEntity">
+    update user
+    set authority = #{authority,jdbcType=INTEGER},
+      mobile = #{mobile,jdbcType=VARCHAR},
+      tid = #{tid,jdbcType=VARCHAR},
+      password = #{password,jdbcType=VARCHAR},
+      item = #{item,jdbcType=VARCHAR},
+      sscore = #{sscore,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      major = #{major,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=VARCHAR}
+  </update>
+    <select id="mobileCheck" parameterType="string" resultType="boolean">
+        select count(mobile)
+        from user
+        where mobile = #{mobile}
+    </select>
+    <select id="getDetailsByMobile" parameterType="string" resultMap="DetailResultMap">
+        select t1.mobile, t1.name as uname, t2.tname, t3.title as titem, t2.tscore, t1.sscore, t1.authority
+        from user t1 left join team t2 on t1.tid = t2.id left join team_subject t3 on t3.id = t2.titem
+        where t1.mobile = #{mobile}
+    </select>
+    <select id="getMemberByMobile" parameterType="string" resultMap="BaseResultMap">
+        select *
+        from user
+        where tid in ( select tid
+          from user
+          where mobile = #{mobile}
+        )
+    </select>
+    <select id="getAuthorityById" parameterType="string" resultType="integer">
+        select authority
+        from user
+        where id = #{id}
+    </select>
+    <select id="login" parameterType="string" resultMap="BaseResultMap">
+        select *
+        from user
+        where mobile = #{mobile} and password = #{password};
+    </select>
+    <select id="getItemById" parameterType="string" resultType="string">
+        select item
+        from user
+        where id = #{id}
+    </select>
+</mapper>
